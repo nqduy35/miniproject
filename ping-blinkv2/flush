@@ -1,0 +1,3 @@
+shopt -s extglob
+rm -rf !(Makefile|ping-blinkv2.c|flush)
+
