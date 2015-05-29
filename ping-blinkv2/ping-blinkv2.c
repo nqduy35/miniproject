@@ -19,6 +19,7 @@
 static struct simple_udp_connection connection;
 uip_ipaddr_t des_ipaddr;
 uip_ipaddr_t src_ipaddr;
+uip_ipaddr_t nxt_ipaddr;
 
 // Starting contiki program
 /*---------------------------------------------------------------------------*/
@@ -34,7 +35,11 @@ static void set_global_address(){
     uip_ds6_addr_add(&src_ipaddr, 0, ADDR_AUTOCONF);
 
     // Destination address
-    uip_ip6addr(&des_ipaddr, 0xaaaa, 0, 0, 0, 0x212, 0x7404, 0x0004, 0x0404);
+    uip_ip6addr(&des_ipaddr,0xaaaa,0,0,0,0,0,0,1);
+    uip_ip6addr(&nxt_ipaddr,0xaaaa,0,0,0,0x212,0x7401,0x1,0x101);
+   
+    // Routing
+    uip_ds6_route_add(&des_ipaddr,64,&nxt_ipaddr);
 }
 
 static void blink(int nb) {
@@ -48,7 +53,7 @@ static void blink(int nb) {
 
 static void receiver() {
     printf("Receive a bonjour \n");
-    leds_on(0xFF); 
+    blink(3); 
 }
 
 // Main process

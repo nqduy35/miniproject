@@ -18,28 +18,28 @@
 
 // Global definition
 /*--------------------------------------------------------------------------------*/
-#define DES_PORT 1234
-#define SRC_PORT 1234
+#define UDP_PORT 1234
 #define MAX_PAYLOAD_LEN 30
 
-static struct simple_udp_conn *connection;
+static struct simple_udp_connection *connection;
 static uip_ipaddr_t destin_ipaddr;
 static uip_ipaddr_t source_ipaddr;
 
 // Starting of contiki program
 /*--------------------------------------------------------------------------------*/
 PROCESS(ping_process, "PING process");
-PROCESS(blink_process, "BLINK process");
+//PROCESS(blink_process, "BLINK process");
 
-AUTOSTART_PROCESSES(&ping_process, &blink_process);
-
+//AUTOSTART_PROCESSES(&ping_process, &blink_process);
+AUTOSTART_PROCESSES(&ping_process);
 
 // Global functions
 /*--------------------------------------------------------------------------------*/
 static void set_global_address() {
     // Source address
-    uip_ip6addr(&source_ipaddr, 0xaaaa, 0, 0, 0, 0, 0, 0, 0);
-    uip_ds6_set_addr_iid(&source_ipaddr, &uip_lladdr);
+    //uip_ip6addr(&source_ipaddr, 0xaaaa, 0, 0, 0, 0, 0, 0, 0);
+    //uip_ds6_set_addr_iid(&source_ipaddr, &uip_lladdr);
+    uip_ip6addr(&source_ipaddr, 0xaaaa, 0, 0, 0, 0x0212, 0x7401, 0x0001, 0x0001);
     uip_ds6_addr_add(&source_ipaddr, 0, ADDR_AUTOCONF);    
 
     // Destination address
@@ -51,7 +51,7 @@ static void send_packet() {
 
     seq_id++;
     printf("ping %s", destin_ipaddr);
-    //uip_udp_packet_sendto(connection, buf, strlen(buf), &destin_ipaddr, UIP_HTONS(IN_PORT));
+    //uip_udp_packet_sendto(connection, buf, strlen(buf), &destin_ipaddr, UIP_HTONS(UDP_PORT));
 }
 static void receiver(struct simple_udp_connection *c, const uip_ipaddr_t *sender_addr,
     uint16_t sender_port, const uip_ipaddr_t *receiver_addr, uint16_t receiver_port,
@@ -71,7 +71,7 @@ PROCESS_THREAD(ping_process, ev, data) {
     set_global_address();
 
     // remote IP equal NULL -> packet from anywhere
-    simple_udp_register(&connection, SRC_PORT, &destin_ipaddr, DES_PORT, receiver);
+    simple_udp_register(&connection, UDP_PORT, &destin_ipaddr, UDP_PORT, receiver);
 
     while(1) {
 	PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor);
@@ -85,17 +85,17 @@ PROCESS_THREAD(ping_process, ev, data) {
 	char buf[20] = "Ohaio!!!";
 	simple_udp_sendto(&connection, buf, strlen(buf) + 1, &destin_ipaddr);
 
-	//connection = udp_new(NULL, UIP_HTONS(OUT_PORT), NULL);
+	//connection = udp_new(NULL, UIP_HTONS(UDP_PORT), NULL);
         //if(connection == NULL) {
         //    printf("No connection");
         //    PROCESS_EXIT();
         //}
-        //udp_bind(connection, UIP_HTONS(IN_PORT));
+        //udp_bind(connection, UIP_HTONS(UDP_PORT));
 	//send_packet();
     }
     PROCESS_END();
 }
-
+/*
 PROCESS_THREAD(blink_process, ev, data) {
     PROCESS_BEGIN();
 
@@ -105,7 +105,7 @@ PROCESS_THREAD(blink_process, ev, data) {
 	    //char *appdata = (char *) uip_appdata;	 
 	    printf("blink");
             leds_on(0xFF);
-	    /*
+
             clock_delay(10000000);	
             leds_off(0xFF);
             clock_delay(10000000);	
@@ -116,8 +116,8 @@ PROCESS_THREAD(blink_process, ev, data) {
             leds_on(0xFF);	   
             clock_delay(10000000);	
             leds_off(0xFF);
-	    */
         }
     }
     PROCESS_END();
-}
+} 
+*/

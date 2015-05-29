@@ -1,0 +1,2 @@
+shopt -s extglob
+rm -rf !(Makefile|*.c|*.h|flush)
